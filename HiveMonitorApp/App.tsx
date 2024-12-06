@@ -8,9 +8,37 @@ import {
   Image,
 } from "react-native";
 import { StatusBar } from 'expo-status-bar';
+import DeviceModal from "./DeviceModal";
+
+import useBLE from "./useBLE";
 
 export default function App() {
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
+  const {
+    requestPermissions,
+    scanForPeripherals,
+    allDevices,
+    connectToDevice,
+    connectedDevice,
+    data
+  } = useBLE();
+
+  const scanForDevices = async () => {
+    const isPermissionsEnabled = await requestPermissions();
+    if(isPermissionsEnabled) {
+      scanForPeripherals();
+    }
+  }
+
+  const hideModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const openModal = async () => {
+    scanForDevices();
+    setIsModalVisible(true);
+  };
 
 
   return (
@@ -18,13 +46,27 @@ export default function App() {
       <StatusBar style="auto" />
       <View style={styles.mainView}>
         <Image source={require('./assets/beeIcon.png')} />
-        <TouchableOpacity
-        // onPress={connectedDevice ? disconnectFromDevice : openModal}
-        style={styles.connectButton}
-        >
-          <Text style={styles.connectButtonTxt}>Znajdź urządzenie</Text>
-        </TouchableOpacity>
+        {connectedDevice ? 
+        (
+          <Text>{data.temperature}</Text>
+        )
+        :
+        (
+          <TouchableOpacity
+          onPress={openModal}
+          style={styles.connectButton}
+          >
+            <Text style={styles.connectButtonTxt}>Znajdź urządzenie</Text>
+          </TouchableOpacity>
+        )}
+
       </View>
+      <DeviceModal
+        closeModal={hideModal}
+        visible={isModalVisible}
+        connectToPeripheral={connectToDevice}
+        devices={allDevices}
+      />
     </SafeAreaView>
   );
 }
