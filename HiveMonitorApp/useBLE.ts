@@ -1,12 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import { BleError, BleManager, Characteristic, Device } from "react-native-ble-plx";
 
 import * as ExpoDevice from "expo-device"
 import base64 from "react-native-base64";
 
-const SERVICE_UUID = "12345678-1234-5678-1234-56789abcdef0";
-const CHARACTERISTIC_UUID = "12345678-1234-5678-1234-56789abcdef0"
+const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
 interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>;
@@ -18,7 +18,9 @@ interface BluetoothLowEnergyApi {
         temperature: number | null;
         humidity: number | null;
         weight: number | null;
+        weightHistory: number[]; 
       };
+    disconnectedFromDevice(): void;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
@@ -30,7 +32,42 @@ function useBLE(): BluetoothLowEnergyApi {
         temperature: null,
         humidity: null,
         weight: null,
+        weightHistory: [],
       });
+    const [deviceDisconnected, setDeviceDisconnected] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Nasłuchiwanie na zmiany stanu Bluetooth
+        const stateChangeSubscription = bleManager.onStateChange((state) => {
+          console.log('Stan Bluetooth zmienił się:', state);
+          if (state === 'PoweredOn') {
+            console.log('Bluetooth jest włączony');
+          }
+        }, true);
+    
+        // Nasłuchiwanie na rozłączenie urządzenia
+        const deviceDisconnectedSubscription = connectedDevice
+          ? bleManager.onDeviceDisconnected(connectedDevice.id, (error: BleError | null, device: Device | null) => {
+              if (error) {
+                console.error('Błąd przy rozłączeniu urządzenia:', error);
+              } else {
+                console.log('Urządzenie rozłączone:', device?.id);
+                setConnectedDevice(null); // Ustawienie stanu po rozłączeniu
+                setDeviceDisconnected(true); // Możesz użyć tego stanu, aby zaktualizować UI
+              }
+            })
+          : undefined;
+    
+        return () => {
+          // Czyszczenie nasłuchiwaczy po unmount
+          stateChangeSubscription.remove();
+          deviceDisconnectedSubscription?.remove();
+        };
+      }, [bleManager, connectedDevice]);
+    
+
+
+    //////////////////////////////////////////
 
     const requestAndroid32Permissions = async () => {
         const bluetoothScanPermissions = await PermissionsAndroid.request(
@@ -118,28 +155,62 @@ function useBLE(): BluetoothLowEnergyApi {
         catch (e) {
             console.log("ERROR IN CONNECTION: ", e);
         }
+
+        device.requestMTU(512).then((mtu) => {
+            console.log(`MTU set to ${mtu}`);
+        });
+        
     }
 
+    
     const onDataUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
-        if (error) {
-            console.log(error);
-            return;
-        } else if (!characteristic?.value) {
-            console.log("No data received");
-            return;
-        }
-        
-        const rawData = base64.decode(characteristic.value);
-        console.log(characteristic.value);
-        console.log(rawData);
+            if (error) {
+                console.error("Error while receiving data:", error);
+                return;
+            }
+    
+            if (!characteristic?.value) {
+                console.log("No data received");
+                return;
+            }
+    
+            try {
+                const rawData = base64.decode(characteristic.value);
+                console.log("Raw data received:", rawData);
+    
+                const jsonData = JSON.parse(rawData);
+                console.log("Parsed JSON Data:", jsonData);
+    
+                handleJsonData(jsonData);
+            } catch (decodeError) {
+                console.error("Error decoding or parsing JSON:", decodeError);
+            }
+    };
+
+    const handleJsonData = (jsonData: any) => {
+        setData((prevData) => ({
+            ...prevData,
+            humidity: jsonData.humidity,
+            temperature: jsonData.temperature,
+            weight: jsonData.weight,
+            weightHistory: jsonData.measurements,
+        }));
     };
 
     const startStreamingData = async (device: Device) => {
+        console.log("zaczynam przyjmowac dane");
         if(device) {
+        console.log("jestem w ifie");
             device.monitorCharacteristicForService(
                 SERVICE_UUID,
                 CHARACTERISTIC_UUID,
-                onDataUpdate
+                (error, characteristic) => {
+                    if (error) {
+                        console.log("Error while monitoring:", error);
+                    } else {
+                        onDataUpdate(error, characteristic);
+                    }
+                }
             )
         }
         else {
@@ -147,13 +218,36 @@ function useBLE(): BluetoothLowEnergyApi {
         }
     }
 
+    const disconnectedFromDevice = () => {
+        if (connectedDevice) {
+            console.log("Disconnecting from device:", connectedDevice.id);
+            bleManager.cancelDeviceConnection(connectedDevice.id)
+                .then(() => {
+                    console.log("Device disconnected");
+                    setConnectedDevice(null);
+                    setData({
+                        temperature: null,
+                        humidity: null,
+                        weight: null,
+                        weightHistory: [],
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error while disconnecting:", error);
+                });
+        } else {
+            console.log("No device connected");
+        }
+    };
+
     return {
         scanForPeripherals,
         requestPermissions,
         allDevices,
         connectToDevice,
         connectedDevice,
-        data
+        data,
+        disconnectedFromDevice
     }
 }
 

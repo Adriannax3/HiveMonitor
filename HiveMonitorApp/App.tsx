@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,8 +11,10 @@ import { StatusBar } from 'expo-status-bar';
 import DeviceModal from "./DeviceModal";
 
 import useBLE from "./useBLE";
+import HiveInformation from "./HiveInformation";
 
 export default function App() {
+
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const {
@@ -21,8 +23,10 @@ export default function App() {
     allDevices,
     connectToDevice,
     connectedDevice,
-    data
+    data,
+    disconnectedFromDevice,
   } = useBLE();
+
 
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
@@ -40,15 +44,24 @@ export default function App() {
     setIsModalVisible(true);
   };
 
+  useEffect(() => {
+    console.log(connectedDevice);
+    if(connectedDevice)console.log("jest urzadzenie");
+    else console.log("nie ma urzadzenia");
+  }, [])
+
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.mainView}>
-        <Image source={require('./assets/beeIcon.png')} />
         {connectedDevice ? 
         (
-          <Text>{data.temperature}</Text>
+          <HiveInformation 
+          data={data}
+          connectedDevice={connectedDevice}
+          disconnectedFromDevice={disconnectedFromDevice}
+          />
         )
         :
         (

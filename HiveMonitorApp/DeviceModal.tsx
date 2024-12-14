@@ -7,6 +7,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  ImageBackground,
 } from "react-native";
 import { Device } from "react-native-ble-plx";
 
@@ -36,7 +38,9 @@ const DeviceModalListItem: FC<DeviceModalListItemProps> = (props) => {
       onPress={connectAndCloseModal}
       style={modalStyle.ctaButton}
     >
-      <Text style={modalStyle.ctaButtonText}>{item.item.name}</Text>
+    <ImageBackground source={require('./assets/hive2.png')}  resizeMode="cover" style={modalStyle.image}>
+        <Text style={modalStyle.ctaButtonText}>{item.item.name?.slice(item.item.name?.search('-')+1)}</Text>
+    </ImageBackground>
     </TouchableOpacity>
   );
 };
@@ -66,13 +70,13 @@ const DeviceModal: FC<DeviceModalProps> = (props) => {
     >
       <SafeAreaView style={modalStyle.modalTitle}>
         <Text style={modalStyle.modalTitleText}>
-          Tap on a device to connect
+          Wybierz ul: 
         </Text>
-        <FlatList
-          contentContainerStyle={modalStyle.modalFlatlistContiner}
-          data={devices}
-          renderItem={renderDeviceModalListItem}
-        />
+            <FlatList
+              contentContainerStyle={modalStyle.modalFlatlistContiner}
+              data={devices}
+              renderItem={renderDeviceModalListItem}
+            />
       </SafeAreaView>
     </Modal>
   );
@@ -107,18 +111,34 @@ const modalStyle = StyleSheet.create({
     textAlign: "center",
   },
   ctaButton: {
-    backgroundColor: "#FF6060",
     justifyContent: "center",
     alignItems: "center",
-    height: 50,
+    height: 150,
     marginHorizontal: 20,
     marginBottom: 5,
     borderRadius: 8,
   },
   ctaButtonText: {
-    fontSize: 18,
+    fontSize: 32,
     fontWeight: "bold",
-    color: "white",
+    color: "black",
+    backgroundColor:"#f6c90e",
+    minWidth: 50,
+    minHeight: 50,
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    borderWidth: 5,
+  },
+  scrollView: {
+    flex: 1,
+  },  
+  image: {
+    flex: 1,
+    minWidth: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
