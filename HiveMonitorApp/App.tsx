@@ -65,12 +65,14 @@ export default function App() {
         )
         :
         (
-          <TouchableOpacity
-          onPress={openModal}
-          style={styles.connectButton}
-          >
-            <Text style={styles.connectButtonTxt}>Znajdź urządzenie</Text>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity
+            onPress={openModal}
+            style={styles.connectButton}
+            >
+              <Text style={styles.connectButtonTxt}>Znajdź urządzenie</Text>
+            </TouchableOpacity>
+          </View>
         )}
 
       </View>
@@ -79,6 +81,7 @@ export default function App() {
         visible={isModalVisible}
         connectToPeripheral={connectToDevice}
         devices={allDevices}
+        scanForPeripherals={scanForPeripherals}
       />
     </SafeAreaView>
   );
@@ -103,7 +106,9 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: '#f6c90e',
+    backgroundColor: '#f8d43f',
+    borderColor: "#f6c90e",
+    borderWidth: 5,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10

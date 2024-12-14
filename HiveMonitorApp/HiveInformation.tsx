@@ -8,7 +8,18 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Dimensions,
 } from "react-native";
+import {
+    LineChart,
+    BarChart,
+    PieChart,
+    ProgressChart,
+    ContributionGraph,
+    StackedBarChart
+  } from "react-native-chart-kit";
+  import * as Animatable from 'react-native-animatable';
+
 
 interface Data {
     temperature: number | null;
@@ -45,30 +56,82 @@ const HiveInformation: FC<Props> = ({ data, connectedDevice, disconnectedFromDev
                                 source={require('./assets/hive2.png')}
                             />
                         </View>
-                        <View>
-                            <Text>Aktualna temperatura: {data.temperature}</Text>
-                            <Text>Aktualna wilgotność: {data.humidity}</Text>
-                            <Text>Aktualna waga: {data.weight}</Text>
-                        </View>
-                        <View>
-                        {data.weightHistory.map((weight, index) => (
-                            <Text key={index}>Waga {index + 1}: {weight}</Text>
-                        ))}
+                        <Animatable.View animation="slideInLeft" duration={1000} easing="ease-in-out" style={styles.boxCurrentInformation}>
+                            {/* Icons created by Freepik - Flaticon */}
+                            <View style={styles.infoRow}>
+                                <Image source={require('./assets/thermometer.png')} style={styles.dataIcon} />
+                                <Text style={styles.boxCurrentInformation_Txt}>{data.temperature}°C</Text>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Image source={require('./assets/humidity.png')} style={styles.dataIcon} />
+                                <Text style={styles.boxCurrentInformation_Txt}>{data.humidity} %</Text>
+                            </View>
+                            <View style={styles.infoRow}>
+                                <Image source={require('./assets/unit.png')} style={styles.dataIcon} />
+                                <Text style={styles.boxCurrentInformation_Txt}>{data.weight} kg</Text>
+                            </View>
+                        </Animatable.View>
+                        <View style={styles.boxChart}>
+                        <Text style={styles.boxChartTitle}>Ostatnie 10 dni</Text>
+                         <LineChart
+                                data={{
+                                    labels: data.weightHistory.map((_, index) => `${10 - index}`), // Etykiety na osi X
+                                    datasets: [
+                                        {
+                                          data: data.weightHistory, // Dane wagowe
+                                          strokeWidth: 2, // Grubość linii
+                                          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                        },
+                                      ],
+                                }}
+                                width={Dimensions.get("window").width} // from react-native
+                                height={220}
+                                yAxisLabel=""
+                                yAxisSuffix="kg"
+                                yAxisInterval={1}
+                                chartConfig={{
+                                    backgroundColor: "#f8d43f",
+                                    backgroundGradientFrom: "#f8d43f",
+                                    backgroundGradientTo: "#f8d43f",
+                                decimalPlaces: 2,
+                                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                style: {
+                                    borderRadius: 16
+                                },
+                                propsForDots: {
+                                    r: "6",
+                                    strokeWidth: "2",
+                                    stroke: "#000"
+                                }
+                                }}
+                                bezier
+                                style={{
+                                marginVertical: 8,
+                                borderRadius: 0
+                                }}
+                            />
                         </View>
 
                         <TouchableOpacity
                                 onPress={disconnectedFromDevice}
                                 style={styles.btnDisconnect}
                             >
-                            <Text>Rozłącz</Text>
+                            <Text style={styles.btnDisconnect_Txt}>Rozłącz</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
             ): (
-                <View style={styles.box}>
-                    <Text>Ul: {connectedDevice?.name}</Text>
-                    <Image source={require('./assets/smartBee.png')} style={styles.beeSmart}/>
-                    <Text>Jeszce nie mam informacji :D</Text>
+                <View style={styles.boxWaiting}>
+                    <Image source={require('./assets/beesScientist.png')} style={styles.beeSmart}/>
+                    <Animatable.Text
+                            animation="flipInX" // Użycie wbudowanej animacji
+                            iterationCount="infinite" // Powtarzanie animacji w nieskończoność
+                            direction="alternate" // Animacja wraca do punktu początkowego
+                            style={styles.boxWaiting_Txt}
+                        >
+                            Zbieram informacje...
+                        </Animatable.Text>
                         <TouchableOpacity
                             onPress={disconnectedFromDevice}
                             style={styles.btnDisconnect}
@@ -87,17 +150,17 @@ const styles = StyleSheet.create({
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      paddingTop: 20,
       padding:0,
       width: '100%',
     },
     beeSmart: {
-        width: 300,
-        height: 300,
+        resizeMode: 'contain',
+        width: '100%',
+        maxHeight: 300,
     },
     scrollView: {
         flex: 1,
-        backgroundColor: '#f8d3cf',
+        paddingVertical: 20,
         width: '100%',
     },
     box: {
@@ -118,13 +181,72 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
     },
+    boxCurrentInformation: {
+        marginTop: 30,
+        padding: 20,
+        flex: 1,
+        width: '100%',
+        marginBottom: 0,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        backgroundColor: '#f8d43f',
+        borderColor: "#f6c90e",
+        borderWidth: 5,
+        padding: 10,
+        borderRadius: 20,
+    },
+    boxCurrentInformation_Txt: {
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    dataIcon: {
+        width: 40,
+        height: 40,
+        resizeMode: 'cover',
+        marginRight: 10,
+    },
+    boxChart: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f8d43f',
+        marginVertical: 50,
+        paddingVertical: 10,
+        borderColor: "#f6c90e",
+        borderWidth: 5,
+        padding: 10,
+    },
+    boxChartTitle: {
+        fontWeight: 'bold',
+        fontSize: 24,
+    },
     btnDisconnect: {
-        backgroundColor:  '#f6c90e',
-        width: 100,
+        backgroundColor: '#f8d43f',
+        borderColor: "#f6c90e",
+        borderWidth: 5,
+        width: 200,
         height: 50,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20,
+        marginBottom: 50,
+    },
+    btnDisconnect_Txt: {
+        fontWeight: '600'
+    },
+    boxWaiting: {
+        flex: 1,
+        width:'100%',
+        height: 800,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    boxWaiting_Txt: {
+        marginVertical: 20,
+        fontWeight: "600",
+        fontSize: 24,
     }
   });
   

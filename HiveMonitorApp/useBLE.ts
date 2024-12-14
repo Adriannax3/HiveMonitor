@@ -126,7 +126,7 @@ function useBLE(): BluetoothLowEnergyApi {
         }
     }
 
-    const isDuplicateDevice = (devices: Device[], nextDevice: Device) => devices.findIndex((device) => nextDevice.id = device.id) > -1;
+    const isDuplicateDevice = (devices: Device[], nextDevice: Device) => devices.findIndex((device) => nextDevice.id === device.id) > -1;
 
     const scanForPeripherals = () => {
         bleManager.startDeviceScan(null, null, (error, device) => {

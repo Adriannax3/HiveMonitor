@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from "react";
+import React, { FC, useCallback, useEffect } from "react";
 import {
   FlatList,
   ListRenderItemInfo,
@@ -23,6 +23,7 @@ type DeviceModalProps = {
   visible: boolean;
   connectToPeripheral: (device: Device) => void;
   closeModal: () => void;
+  scanForPeripherals: () => void;
 };
 
 const DeviceModalListItem: FC<DeviceModalListItemProps> = (props) => {
@@ -48,6 +49,10 @@ const DeviceModalListItem: FC<DeviceModalListItemProps> = (props) => {
 const DeviceModal: FC<DeviceModalProps> = (props) => {
   const { devices, visible, connectToPeripheral, closeModal } = props;
 
+  useEffect(() => {
+    console.log(devices);
+  }, [])
+
   const renderDeviceModalListItem = useCallback(
     (item: ListRenderItemInfo<Device>) => {
       return (
@@ -67,16 +72,26 @@ const DeviceModal: FC<DeviceModalProps> = (props) => {
       animationType="slide"
       transparent={false}
       visible={visible}
+      onRequestClose={closeModal}
     >
       <SafeAreaView style={modalStyle.modalTitle}>
         <Text style={modalStyle.modalTitleText}>
           Wybierz ul: 
         </Text>
-            <FlatList
-              contentContainerStyle={modalStyle.modalFlatlistContiner}
-              data={devices}
-              renderItem={renderDeviceModalListItem}
-            />
+        {devices.length !== 0 ? (
+          <FlatList
+            contentContainerStyle={modalStyle.modalFlatlistContiner}
+            data={devices}
+            renderItem={renderDeviceModalListItem}
+          />
+        ) : 
+        <Text style={modalStyle.noDevices_Txt}>Brak urządzeń w pobliżu...</Text>}
+          <TouchableOpacity
+            onPress={props.scanForPeripherals} 
+            style={modalStyle.btnRefresh}
+          >
+              <Text style={modalStyle.btnRefresh_Txt}>Odśwież</Text>
+          </TouchableOpacity>
       </SafeAreaView>
     </Modal>
   );
@@ -90,18 +105,12 @@ const modalStyle = StyleSheet.create({
   modalFlatlistContiner: {
     flex: 1,
     justifyContent: "center",
-  },
-  modalCellOutline: {
-    borderWidth: 1,
-    borderColor: "black",
-    alignItems: "center",
-    marginHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 8,
+    flexDirection: 'row',
   },
   modalTitle: {
     flex: 1,
     backgroundColor: "#f2f2f2",
+    alignItems: 'center',
   },
   modalTitleText: {
     marginTop: 40,
@@ -139,6 +148,31 @@ const modalStyle = StyleSheet.create({
     minWidth: 100,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  btnRefresh: {
+    width: 150,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    backgroundColor: '#f8d43f',
+    borderColor: "#f6c90e",
+    borderWidth: 5,
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  btnRefresh_Txt: {
+    fontSize: 18,
+    color: "black",
+    fontWeight: '600',
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
+  noDevices_Txt: {
+    fontSize: 18,
+    marginVertical: 20,
   },
 });
 
