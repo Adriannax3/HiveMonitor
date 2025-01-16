@@ -18,7 +18,9 @@ interface BluetoothLowEnergyApi {
         temperature: number | null;
         humidity: number | null;
         weight: number | null;
-        weightHistory: number[]; 
+        weightHistory: number[];
+        temperatureHistory: number[];
+        humidityHistory: number[];
       };
     disconnectedFromDevice(): void;
 }
@@ -33,6 +35,8 @@ function useBLE(): BluetoothLowEnergyApi {
         humidity: null,
         weight: null,
         weightHistory: [],
+        temperatureHistory: [],
+        humidityHistory: [],
       });
     const [deviceDisconnected, setDeviceDisconnected] = useState<boolean>(false);
 
@@ -163,37 +167,61 @@ function useBLE(): BluetoothLowEnergyApi {
     }
 
     
-    const onDataUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
-            if (error) {
-                console.error("Error while receiving data:", error);
-                return;
-            }
-    
-            if (!characteristic?.value) {
-                console.log("No data received");
-                return;
-            }
-    
-            try {
-                const rawData = base64.decode(characteristic.value);
-                console.log("Raw data received:", rawData);
-    
-                const jsonData = JSON.parse(rawData);
-                console.log("Parsed JSON Data:", jsonData);
-    
-                handleJsonData(jsonData);
-            } catch (decodeError) {
-                console.error("Error decoding or parsing JSON:", decodeError);
-            }
-    };
+    let buffer = "";
 
+    const onDataUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
+        if (error) {
+            console.error("Błąd podczas odbierania danych:", error);
+            return;
+        }
+    
+        if (!characteristic?.value) {
+            console.log("Nie odebrano danych");
+            return;
+        }
+    
+        try {
+            // Dekodowanie danych zakodowanych w base64
+            const rawData = base64.decode(characteristic.value);
+            console.log("Otrzymane dane surowe:", rawData);
+    
+            // Dodawanie danych do bufora
+            buffer += rawData;
+    
+            // Sprawdzenie, czy bufor zawiera kompletne dane JSON (zakładamy zakończenie '}' dla JSON)
+            if (buffer.trim().endsWith('}')) {
+                // Próba sparsowania danych JSON
+                console.log("Odebrane dane: "+buffer);
+                const jsonData = JSON.parse(buffer);
+                console.log("Sparsowane dane JSON:", jsonData);
+    
+                // Obsługa sparsowanych danych JSON
+                handleJsonData(jsonData);
+    
+                // Czyszczenie bufora po zakończeniu
+                buffer = "";
+            } else {
+                console.log("Czekam na więcej danych...");
+            }
+        } catch (decodeError) {
+            // Szczegółowe komunikaty błędów w zależności od rodzaju błędu
+            if (decodeError instanceof SyntaxError) {
+                console.error("Błąd parsowania JSON. Upewnij się, że dane są kompletne i poprawne:", decodeError);
+            } else {
+                console.error("Błąd dekodowania lub przetwarzania danych:", decodeError);
+            }
+        }
+    };
+    
     const handleJsonData = (jsonData: any) => {
         setData((prevData) => ({
             ...prevData,
-            humidity: jsonData.humidity,
-            temperature: jsonData.temperature,
-            weight: jsonData.weight,
-            weightHistory: jsonData.measurements,
+            humidity: jsonData.currentHumidity,
+            temperature: jsonData.currentTemperature,
+            weight: jsonData.currentWeight,
+            weightHistory: jsonData.lastWeights,
+            temperatureHistory: jsonData.lastTemps,
+            humidityHistory: jsonData.lastHums,
         }));
     };
 
@@ -230,6 +258,8 @@ function useBLE(): BluetoothLowEnergyApi {
                         humidity: null,
                         weight: null,
                         weightHistory: [],
+                        temperatureHistory: [],
+                        humidityHistory: [],
                     });
                 })
                 .catch((error) => {

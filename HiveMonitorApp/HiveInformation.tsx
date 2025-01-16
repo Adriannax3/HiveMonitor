@@ -25,6 +25,9 @@ interface Data {
     temperature: number | null;
     humidity: number | null;
     weight: number | null;
+    weightHistory: number[] | null;
+    temperatureHistory: number[] | null;
+    humidityHistory: number[] | null;
 }
 
 interface Props {
@@ -71,47 +74,135 @@ const HiveInformation: FC<Props> = ({ data, connectedDevice, disconnectedFromDev
                                 <Text style={styles.boxCurrentInformation_Txt}>{data.weight} kg</Text>
                             </View>
                         </Animatable.View>
-                        <View style={styles.boxChart}>
-                        <Text style={styles.boxChartTitle}>Ostatnie 10 dni</Text>
-                         <LineChart
-                                data={{
-                                    labels: data.weightHistory.map((_, index) => `${10 - index}`), // Etykiety na osi X
-                                    datasets: [
-                                        {
-                                          data: data.weightHistory, // Dane wagowe
-                                          strokeWidth: 2, // Grubość linii
-                                          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                        },
-                                      ],
-                                }}
-                                width={Dimensions.get("window").width} // from react-native
-                                height={220}
-                                yAxisLabel=""
-                                yAxisSuffix="kg"
-                                yAxisInterval={1}
-                                chartConfig={{
-                                    backgroundColor: "#f8d43f",
-                                    backgroundGradientFrom: "#f8d43f",
-                                    backgroundGradientTo: "#f8d43f",
-                                decimalPlaces: 2,
-                                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                style: {
-                                    borderRadius: 16
-                                },
-                                propsForDots: {
-                                    r: "6",
-                                    strokeWidth: "2",
-                                    stroke: "#000"
-                                }
-                                }}
-                                bezier
-                                style={{
-                                marginVertical: 8,
-                                borderRadius: 0
-                                }}
-                            />
-                        </View>
+                            <View style={styles.boxChart}>
+                            <Text style={styles.boxChartTitle}>Ostatnie 10 dni waga</Text>
+                            <LineChart
+                                    data={{
+                                        labels: data.weightHistory.map((_, index) => `${0 - index}`), // Etykiety na osi X
+                                        datasets: [
+                                            {
+                                            data: data.weightHistory, // Dane wagowe
+                                            strokeWidth: 2, // Grubość linii
+                                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                            },
+                                        ],
+                                    }}
+                                    width={Dimensions.get("window").width} // from react-native
+                                    height={220}
+                                    xAxisLabel="day"
+                                    yAxisLabel=""
+                                    yAxisSuffix="kg"
+                                    yAxisInterval={1}
+                                    chartConfig={{
+                                        backgroundColor: "#f8d43f",
+                                        backgroundGradientFrom: "#f8d43f",
+                                        backgroundGradientTo: "#f8d43f",
+                                    decimalPlaces: 2,
+                                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    style: {
+                                        borderRadius: 16
+                                    },
+                                    propsForDots: {
+                                        r: "6",
+                                        strokeWidth: "2",
+                                        stroke: "#000"
+                                    }
+                                    }}
+                                    bezier
+                                    style={{
+                                    marginVertical: 8,
+                                    borderRadius: 0
+                                    }}
+                                />
+                            </View>
+
+                            <View style={styles.boxChart}>
+                            <Text style={styles.boxChartTitle}>Ostatnie 10 dni temperatura</Text>
+                            <LineChart
+                                    data={{
+                                        labels: data.temperatureHistory.map((_, index) => `${0 - index}`), // Etykiety na osi X
+                                        datasets: [
+                                            {
+                                            data: data.temperatureHistory, // Dane wagowe
+                                            strokeWidth: 2, // Grubość linii
+                                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                            },
+                                        ],
+                                    }}
+                                    width={Dimensions.get("window").width} // from react-native
+                                    height={220}
+                                    xAxisLabel="day"
+                                    yAxisLabel=""
+                                    yAxisSuffix="°C"
+                                    yAxisInterval={1}
+                                    chartConfig={{
+                                        backgroundColor: "#f8d43f",
+                                        backgroundGradientFrom: "#f8d43f",
+                                        backgroundGradientTo: "#f8d43f",
+                                    decimalPlaces: 2,
+                                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    style: {
+                                        borderRadius: 16
+                                    },
+                                    propsForDots: {
+                                        r: "6",
+                                        strokeWidth: "2",
+                                        stroke: "#000"
+                                    }
+                                    }}
+                                    bezier
+                                    style={{
+                                    marginVertical: 8,
+                                    borderRadius: 0
+                                    }}
+                                />
+                            </View>                        
+
+                            <View style={styles.boxChart}>
+                            <Text style={styles.boxChartTitle}>Ostatnie 10 dni wilgotność</Text>
+                            <LineChart
+                                    data={{
+                                        labels: data.humidityHistory.map((_, index) => `${0 - index}`), // Etykiety na osi X
+                                        datasets: [
+                                            {
+                                            data: data.humidityHistory, // Dane wagowe
+                                            strokeWidth: 2, // Grubość linii
+                                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                            },
+                                        ],
+                                    }}
+                                    width={Dimensions.get("window").width} // from react-native
+                                    height={220}
+                                    xAxisLabel="day"
+                                    yAxisLabel=""
+                                    yAxisSuffix="%"
+                                    yAxisInterval={1}
+                                    chartConfig={{
+                                        backgroundColor: "#f8d43f",
+                                        backgroundGradientFrom: "#f8d43f",
+                                        backgroundGradientTo: "#f8d43f",
+                                    decimalPlaces: 2,
+                                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    style: {
+                                        borderRadius: 16
+                                    },
+                                    propsForDots: {
+                                        r: "6",
+                                        strokeWidth: "2",
+                                        stroke: "#000"
+                                    }
+                                    }}
+                                    bezier
+                                    style={{
+                                    marginVertical: 8,
+                                    borderRadius: 0
+                                    }}
+                                />
+                            </View>                        
+
 
                         <TouchableOpacity
                                 onPress={disconnectedFromDevice}
@@ -162,10 +253,10 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 20,
         width: '100%',
+        height: '100%',
     },
     box: {
         flex: 1,
-        height: 800,
         alignItems: 'center'
     },
     boxTitle: {
@@ -182,7 +273,6 @@ const styles = StyleSheet.create({
         height: 50,
     },
     boxCurrentInformation: {
-        marginTop: 30,
         padding: 20,
         flex: 1,
         width: '100%',
@@ -212,7 +302,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#f8d43f',
-        marginVertical: 50,
+        marginVertical: 10,
         paddingVertical: 10,
         borderColor: "#f6c90e",
         borderWidth: 5,
