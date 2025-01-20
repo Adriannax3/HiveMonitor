@@ -257,7 +257,8 @@ const styles = StyleSheet.create({
     },
     box: {
         flex: 1,
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingBottom: 50,
     },
     boxTitle: {
         flexDirection: 'row',

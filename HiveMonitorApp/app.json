@@ -42,6 +42,11 @@
     },
     "web": {
       "favicon": "./assets/beeIcon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1a07363c-c553-4664-9946-a36ea87c8031"
+      }
     }
   }
 }
