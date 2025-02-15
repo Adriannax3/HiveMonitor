@@ -8,6 +8,9 @@ import base64 from "react-native-base64";
 const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
+
+let buffer = "";
+
 interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>;
     scanForPeripherals(): void;
@@ -138,7 +141,7 @@ function useBLE(): BluetoothLowEnergyApi {
             if(error) {
                 console.log(error);
             }
-            if (device && device.name?.includes("HiveMonitor")) {
+            if (device && device.name?.includes("HM")) {
                 setAllDevices((prevState) => {
                     if(!isDuplicateDevice(prevState, device)) {
                         return[...prevState, device];
@@ -161,14 +164,13 @@ function useBLE(): BluetoothLowEnergyApi {
             console.log("ERROR IN CONNECTION: ", e);
         }
 
-        device.requestMTU(512).then((mtu) => {
-            console.log(`MTU set to ${mtu}`);
-        });
+        // device.requestMTU(512).then((mtu) => {
+        //     console.log(`MTU set to ${mtu}`);
+        // });
         
     }
 
     
-    let buffer = "";
 
     const onDataUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
         if (error) {
@@ -191,20 +193,25 @@ function useBLE(): BluetoothLowEnergyApi {
     
             // Sprawdzenie, czy bufor zawiera kompletne dane JSON (zakładamy zakończenie '}' dla JSON)
             if (buffer.trim().endsWith('}')) {
-                // Próba sparsowania danych JSON
-                console.log("Odebrane dane: "+buffer);
-                const jsonData = JSON.parse(buffer);
-                console.log("Sparsowane dane JSON:", jsonData);
-    
-                // Obsługa sparsowanych danych JSON
-                handleJsonData(jsonData);
-    
-                // Czyszczenie bufora po zakończeniu
-                buffer = "";
+                let match = buffer.match(/\{.*\}/s);
+                if (match) {
+                    console.log(match);
+                    const jsonData = JSON.parse(match[0]);
+                    console.log("Sparsowane dane JSON:", jsonData);
+                    handleJsonData(jsonData);
+                
+                    // Czyszczenie bufora po znalezieniu kompletnego bloku JSON
+                    buffer = buffer.slice(match.index! + match[0].length); // Usuwa parsowany fragment z bufora
+                } else {
+                    buffer="";
+                    console.log("Czekam na więcej danych...Ale wyczyscilem bufor");
+                }
+                buffer="";
             } else {
-                console.log("Czekam na więcej danych...");
+                console.log("Czekam na więcej danych...Ale wyczyscilem bufor2");
             }
         } catch (decodeError) {
+            buffer="";
             // Szczegółowe komunikaty błędów w zależności od rodzaju błędu
             if (decodeError instanceof SyntaxError) {
                 console.error("Błąd parsowania JSON. Upewnij się, że dane są kompletne i poprawne:", decodeError);
@@ -229,7 +236,7 @@ function useBLE(): BluetoothLowEnergyApi {
     const startStreamingData = async (device: Device) => {
         console.log("zaczynam przyjmowac dane");
         if(device) {
-        console.log("jestem w ifie");
+        console.log("jestem urzadzenie");
             device.monitorCharacteristicForService(
                 SERVICE_UUID,
                 CHARACTERISTIC_UUID,
