@@ -44,23 +44,19 @@ function useBLE(): BluetoothLowEnergyApi {
     const [deviceDisconnected, setDeviceDisconnected] = useState<boolean>(false);
 
     useEffect(() => {
-        // Nasłuchiwanie na zmiany stanu Bluetooth
         const stateChangeSubscription = bleManager.onStateChange((state) => {
-          console.log('Stan Bluetooth zmienił się:', state);
           if (state === 'PoweredOn') {
-            console.log('Bluetooth jest włączony');
+            console.log('Bluetooth on');
           }
         }, true);
     
-        // Nasłuchiwanie na rozłączenie urządzenia
         const deviceDisconnectedSubscription = connectedDevice
           ? bleManager.onDeviceDisconnected(connectedDevice.id, (error: BleError | null, device: Device | null) => {
               if (error) {
-                console.error('Błąd przy rozłączeniu urządzenia:', error);
+                console.error('Disconnected error:', error);
               } else {
-                console.log('Urządzenie rozłączone:', device?.id);
-                setConnectedDevice(null); // Ustawienie stanu po rozłączeniu
-                setDeviceDisconnected(true); // Możesz użyć tego stanu, aby zaktualizować UI
+                setConnectedDevice(null);
+                setDeviceDisconnected(true);
               }
             })
           : undefined;
@@ -192,7 +188,6 @@ function useBLE(): BluetoothLowEnergyApi {
                 if (match) {
                     console.log(match);
                     const jsonData = JSON.parse(match[0]);
-                    console.log("Sparsowane dane JSON:", jsonData);
                     handleJsonData(jsonData);
                 
                     buffer = buffer.slice(match.index! + match[0].length);
@@ -204,7 +199,6 @@ function useBLE(): BluetoothLowEnergyApi {
             }
         } catch (decodeError) {
             buffer="";
-            // Szczegółowe komunikaty błędów w zależności od rodzaju błędu
             if (decodeError instanceof SyntaxError) {
                 console.error("JSON Error:", decodeError);
             } else {
@@ -226,9 +220,7 @@ function useBLE(): BluetoothLowEnergyApi {
     };
 
     const startStreamingData = async (device: Device) => {
-        console.log("zaczynam przyjmowac dane");
         if(device) {
-        console.log("jestem urzadzenie");
             device.monitorCharacteristicForService(
                 SERVICE_UUID,
                 CHARACTERISTIC_UUID,

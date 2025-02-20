@@ -76,7 +76,7 @@ const DeviceModal: FC<DeviceModalProps> = (props) => {
     >
       <SafeAreaView style={modalStyle.modalTitle}>
         <Text style={modalStyle.modalTitleText}>
-          Wybierz ul: 
+          Choose hive: 
         </Text>
         {devices.length !== 0 ? (
           <FlatList
@@ -85,12 +85,12 @@ const DeviceModal: FC<DeviceModalProps> = (props) => {
             renderItem={renderDeviceModalListItem}
           />
         ) : 
-        <Text style={modalStyle.noDevices_Txt}>Brak urządzeń w pobliżu...</Text>}
+        <Text style={modalStyle.noDevices_Txt}>No devices nearby...</Text>}
           <TouchableOpacity
             onPress={props.scanForPeripherals} 
             style={modalStyle.btnRefresh}
           >
-              <Text style={modalStyle.btnRefresh_Txt}>Odśwież</Text>
+              <Text style={modalStyle.btnRefresh_Txt}>Refresh</Text>
           </TouchableOpacity>
       </SafeAreaView>
     </Modal>

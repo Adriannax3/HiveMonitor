@@ -56,7 +56,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.banner}>
-        <Text style={styles.bannerTxt}>Monitor do ula</Text>
+        <Text style={styles.bannerTxt}>Hive monitor</Text>
       </View>
       <View style={styles.mainView}>
         {connectedDevice ? 
@@ -75,44 +75,44 @@ export default function App() {
               onPress={openModal}
               style={styles.connectButton}
               >
-                <Text style={styles.connectButtonTxt}>Znajdź urządzenie</Text>
+                <Text style={styles.connectButtonTxt}>Find device</Text>
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.infoBoxWrapper} horizontal={true}>
               <ScrollView style={styles.infoBox}>
-                <Text style={styles.infoBoxTitle}>Dlaczego temperatura w ulu jest ważna?</Text>
+                <Text style={styles.infoBoxTitle}>Why is hive temperature important?</Text>
                 <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Regulacja mikroklimatu:   </Text> Pszczoły są bardzo wrażliwe na temperaturę. Utrzymywanie odpowiedniego zakresu temperatury w ulu (zwykle między 34°C a 36°C dla larw i jaj) jest niezbędne do prawidłowego rozwoju młodych pszczół.  
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Microclimate regulation: </Text> Bees are highly sensitive to temperature. Maintaining the proper temperature range inside the hive (usually between 34°C and 36°C for larvae and eggs) is essential for the healthy development of young bees.
                 </Text>
                 <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Zdrowie roju: </Text> Zbyt wysoka lub zbyt niska temperatura może prowadzić do chorób lub osłabienia pszczół, wpływając na ich zdolność do przeżycia zimy czy produkcji miodu.  
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Colony health: </Text> Too high or too low temperatures can lead to diseases or weaken the bees, affecting their ability to survive winter and produce honey.
                 </Text>
                 <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Wczesne ostrzeżenie:  </Text> Monitorowanie temperatury może wskazywać na problemy z wentylacją w ulu lub na zewnętrzne warunki, które mogą wymagać interwencji pszczelarza.  
-                </Text>
-              </ScrollView>
-              <ScrollView style={styles.infoBox}>
-                <Text style={styles.infoBoxTitle}>Dlaczego wilgotność w ulu jest ważna?</Text>
-                <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Zapobieganie chorobom:  </Text> Odpowiednia wilgotność (zazwyczaj między 50% a 60%) pomaga zapobiegać rozwojowi pleśni i grzybów, które mogą być szkodliwe dla pszczół.  
-                </Text>
-                <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Produkcja miodu: </Text> Wilgotność wpływa na proces dojrzewania miodu. Zbyt wysoka wilgotność może prowadzić do fermentacji miodu, a zbyt niska do jego zbytniego wysuszenia.  
-                </Text>
-                <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Komfort pszczół: </Text>Pszczoły potrzebują odpowiedniego poziomu wilgotności do regulacji temperatury wewnątrz ula, szczególnie w gorące dni.  
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Early warning: </Text> Monitoring temperature can indicate ventilation issues inside the hive or external conditions that may require beekeeper intervention.
                 </Text>
               </ScrollView>
               <ScrollView style={styles.infoBox}>
-                <Text style={styles.infoBoxTitle}>Dlaczego monitorowanie wagi ula jest ważne?</Text>
+                <Text style={styles.infoBoxTitle}>Why is hive humidity important?</Text>
                 <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Monitorowanie zasobów: </Text> Waga ula może wskazywać na ilość miodu lub pyłku przechowywanego w ulu, co jest kluczowe do oceny, czy pszczoły mają wystarczająco dużo pożywienia na zimę.  
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Disease prevention: </Text> Proper humidity levels (typically between 50% and 60%) help prevent the growth of mold and fungi, which can be harmful to bees.
                 </Text>
                 <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Zdrowie ula:</Text> Zmiany w wadze mogą również wskazywać na rozwój roju lub na problemy, takie jak opuszczenie ula przez pszczoły lub atak szkodników. 
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Honey production: </Text> Humidity affects the honey maturation process. Too high humidity can lead to honey fermentation, while too low humidity can cause it to dry out too much.
                 </Text>
                 <Text style={styles.infoBoxTxt}>
-                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}>• Planowanie zbiorów:</Text> Pomaga pszczelarzowi w określeniu, kiedy można bezpiecznie zbierać miód, nie narażając pszczół na brak pożywienia.
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Bee comfort: </Text> Bees need proper humidity levels to regulate the temperature inside the hive, especially on hot days.
+                </Text>
+              </ScrollView>
+              <ScrollView style={styles.infoBox}>
+                <Text style={styles.infoBoxTitle}>Why is monitoring hive weight important?</Text>
+                <Text style={styles.infoBoxTxt}>
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Resource monitoring: </Text> The weight of the hive can indicate the amount of stored honey or pollen, which is crucial to assess whether the bees have enough food for the winter.
+                </Text>
+                <Text style={styles.infoBoxTxt}>
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Hive health: </Text> Changes in weight can also indicate colony growth or problems such as bees abandoning the hive or pest attacks.
+                </Text>
+                <Text style={styles.infoBoxTxt}>
+                  <Text style={[styles.infoBoxTxt, { fontWeight: 'bold' }]}> • Harvest planning: </Text> Helps the beekeeper determine when it is safe to harvest honey without endangering the bees' food supply.
                 </Text>
               </ScrollView>
             </ScrollView>
