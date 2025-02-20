@@ -174,24 +174,19 @@ function useBLE(): BluetoothLowEnergyApi {
 
     const onDataUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
         if (error) {
-            console.error("Błąd podczas odbierania danych:", error);
+            console.error("Error:", error);
             return;
         }
     
         if (!characteristic?.value) {
-            console.log("Nie odebrano danych");
             return;
         }
     
         try {
-            // Dekodowanie danych zakodowanych w base64
             const rawData = base64.decode(characteristic.value);
-            console.log("Otrzymane dane surowe:", rawData);
     
-            // Dodawanie danych do bufora
             buffer += rawData;
     
-            // Sprawdzenie, czy bufor zawiera kompletne dane JSON (zakładamy zakończenie '}' dla JSON)
             if (buffer.trim().endsWith('}')) {
                 let match = buffer.match(/\{.*\}/s);
                 if (match) {
@@ -200,23 +195,20 @@ function useBLE(): BluetoothLowEnergyApi {
                     console.log("Sparsowane dane JSON:", jsonData);
                     handleJsonData(jsonData);
                 
-                    // Czyszczenie bufora po znalezieniu kompletnego bloku JSON
-                    buffer = buffer.slice(match.index! + match[0].length); // Usuwa parsowany fragment z bufora
+                    buffer = buffer.slice(match.index! + match[0].length);
                 } else {
                     buffer="";
-                    console.log("Czekam na więcej danych...Ale wyczyscilem bufor");
                 }
                 buffer="";
             } else {
-                console.log("Czekam na więcej danych...Ale wyczyscilem bufor2");
             }
         } catch (decodeError) {
             buffer="";
             // Szczegółowe komunikaty błędów w zależności od rodzaju błędu
             if (decodeError instanceof SyntaxError) {
-                console.error("Błąd parsowania JSON. Upewnij się, że dane są kompletne i poprawne:", decodeError);
+                console.error("JSON Error:", decodeError);
             } else {
-                console.error("Błąd dekodowania lub przetwarzania danych:", decodeError);
+                console.error("JSON encode error:", decodeError);
             }
         }
     };
